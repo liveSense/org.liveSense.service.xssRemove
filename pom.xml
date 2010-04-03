@@ -77,7 +77,7 @@
                     <instructions>
 
                         <Export-Package>
-                            org.liveSense.service.XSSRemove.*
+                            org.liveSense.service.XSSRemove.*;version=${pom.version}
                         </Export-Package>
 
                         <Embed-Dependency>
