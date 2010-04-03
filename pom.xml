@@ -23,7 +23,7 @@
     <groupId>org.liveSense</groupId>
     <artifactId>org.liveSense.service.XSSRemove</artifactId>
     <packaging>bundle</packaging>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>liveSense XSS Remove service</name>
     <description>liveSense XSS Vulnerability Remove service and observer</description>
 
