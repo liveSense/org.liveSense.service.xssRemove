@@ -21,14 +21,11 @@ package org.liveSense.service.xssRemove;
  * @created Feb 13, 2010
  */
 
-import com.xerox.adoc.dexss.DeXSS;
-import com.xerox.adoc.dexss.DeXSSChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.logging.Level;
 import javax.jcr.Node;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
@@ -39,8 +36,8 @@ import org.apache.sling.commons.osgi.OsgiUtil;
 
 import org.apache.sling.jcr.api.SlingRepository;
 import org.ccil.cowan.tagsoup.XMLWriter;
-import org.liveSense.utils.AdministrativeService;
-import org.liveSense.utils.Configurator;
+import org.liveSense.core.AdministrativeService;
+import org.liveSense.core.Configurator;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
