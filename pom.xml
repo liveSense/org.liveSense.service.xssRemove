@@ -30,7 +30,6 @@
       <url>https://github.com/liveSense/org.liveSense.service.xssRemove</url>
   </scm>
 
-    <groupId>org.liveSense</groupId>
     <artifactId>org.liveSense.service.xssRemove</artifactId>
     <packaging>bundle</packaging>
     <version>1.0.1-SNAPSHOT</version>
