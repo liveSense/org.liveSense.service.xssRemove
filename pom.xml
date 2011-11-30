@@ -73,10 +73,6 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>org.apache.sling</groupId>
-            <artifactId>org.apache.sling.commons.log</artifactId>
-        </dependency>
-        <dependency>
             <groupId>javax.jcr</groupId>
             <artifactId>jcr</artifactId>
         </dependency>
