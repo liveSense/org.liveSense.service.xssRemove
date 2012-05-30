@@ -33,7 +33,7 @@
     <artifactId>org.liveSense.service.xssRemove</artifactId>
     <packaging>bundle</packaging>
     <version>1.0.1-SNAPSHOT</version>
-    <name>liveSense XSS Remove service</name>
+    <name>liveSense :: Service :: XSS Remove</name>
     <description>liveSense XSS Vulnerability Remove service and observer</description>
 
     <build>
