@@ -36,7 +36,6 @@ import org.apache.sling.commons.osgi.OsgiUtil;
 
 import org.apache.sling.jcr.api.SlingRepository;
 import org.ccil.cowan.tagsoup.XMLWriter;
-import org.liveSense.core.AdministrativeService;
 import org.liveSense.core.Configurator;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -53,12 +52,12 @@ import org.xml.sax.SAXNotSupportedException;
  *
  */
 
-public class XSSRemoveImpl extends AdministrativeService implements XSSRemove {
+public class XSSRemoveImpl implements XSSRemove {
 
     private static final Logger log = LoggerFactory.getLogger(XSSRemoveImpl.class);
 
     private ObservationManager observationManager;
-    /** 
+    /**
      * @scr.reference
      */
     private SlingRepository repository;
@@ -180,7 +179,7 @@ public class XSSRemoveImpl extends AdministrativeService implements XSSRemove {
      */
     protected void activate(ComponentContext componentContext) throws RepositoryException {
         Dictionary<?, ?> props = componentContext.getProperties();
-        
+
         // Setting up contentPathes
         String[] contentPathesNew = OsgiUtil.toStringArray(componentContext.getProperties().get(PARAM_CONTENT_PATHES), DEFAULT_CONTENT_PATHES);
         boolean contentPathesChanged = false;
@@ -214,7 +213,7 @@ public class XSSRemoveImpl extends AdministrativeService implements XSSRemove {
             }
         }
 
-       
+
         // Setting up elementRemovalList
         String[] elementRemovalListNew = OsgiUtil.toStringArray(componentContext.getProperties().get(PARAM_ELEMENT_REMOVAL_LIST), DEFAULT_ELEMENT_REMOVAL_LIST);
         boolean elementRemovalListChanged = false;
@@ -464,7 +463,7 @@ public class XSSRemoveImpl extends AdministrativeService implements XSSRemove {
     //    xmlWriter.setOutputProperty(XMLWriter.OMIT_XML_DECLARATION, "yes");
     //    parser = new XSSParser();
 
-        session = getAdministrativeSession(repository);
+        session = repository.loginAdministrative(null);
         if (repository.getDescriptor(Repository.OPTION_OBSERVATION_SUPPORTED).equals("true")) {
             observationManager = session.getWorkspace().getObservationManager();
             //String[] types = {"nt:resource"};
@@ -481,16 +480,17 @@ public class XSSRemoveImpl extends AdministrativeService implements XSSRemove {
             }
         }
     }
-    
 
-    @Override
+
     public void deactivate(ComponentContext componentContext) throws RepositoryException {
-        super.deactivate(componentContext);
         if (observationManager != null) {
             for (XSSRemoveEventListener listener : eventListeners) {
                 observationManager.removeEventListener(listener);
             }
         }
+    	if (session != null && session.isLive()) {
+    		session.logout();
+    	}
     }
 
     boolean isValidMimeType(Node node) throws RepositoryException {
@@ -510,7 +510,7 @@ public class XSSRemoveImpl extends AdministrativeService implements XSSRemove {
     }
 
     public void removeXSSsecurityVulnerability(String parentFolder, String fileName) throws RepositoryException, Exception {
-        if (!session.isLive()) session = getAdministrativeSession(repository);
+        if (!session.isLive()) session = repository.loginAdministrative(null);
         Node node = session.getRootNode().getNode(parentFolder+"/"+fileName);
         if (isValidMimeType(node)) {
             log.info("Removing XSS Vulnerability codes for node {}", node.getPath());
@@ -519,7 +519,7 @@ public class XSSRemoveImpl extends AdministrativeService implements XSSRemove {
             XMLWriter xmlWriter = new XMLWriter(sw);
             xmlWriter.setOutputProperty(XMLWriter.OMIT_XML_DECLARATION, "yes");
             xmlWriter.setOutputProperty(XMLWriter.ENCODING, configurator.getEncoding());
-            parser.setContentHandler(xmlWriter);         
+            parser.setContentHandler(xmlWriter);
             parser.parse(new InputSource(new InputStreamReader(node.getNode("jcr:content").getProperty("jcr:data").getStream(), configurator.getEncoding())));
             node.getNode("jcr:content").setProperty("jcr:data", new ByteArrayInputStream(sw.toString().getBytes(configurator.getEncoding())));
 
