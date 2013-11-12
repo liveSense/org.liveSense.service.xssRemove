@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><features name="liveSense-${liveSense.version}-service-xssRemove" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
+	<feature name="liveSense-service-xssRemove" version="${liveSense.service.xssRemove.version}" description="liveSense service xssRemove">
+        <feature>liveSense-core-base</feature>
+		<bundle>mvn:com.github.livesense/org.liveSense.service.xssRemove/${liveSense.service.xssRemove.version}</bundle>
+	</feature>
+</features>
