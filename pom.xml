@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
-/*
+ /*
  *  Copyright 2010 Robert Csakany <robson@semmi.se>.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,55 +16,55 @@
  *  limitations under the License.
  *  under the License.
  */
--->
+ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-  <parent>
-      <groupId>com.github.livesense</groupId>
-      <artifactId>org.liveSense.parent</artifactId>
-      <version>2-SNAPSHOT</version>
+    <parent>
+        <groupId>com.github.livesense</groupId>
+        <artifactId>org.liveSense.parent</artifactId>
+        <version>2-SNAPSHOT</version>
 		<relativePath>..</relativePath>
-  </parent>
-  <scm>
-      <connection>scm:git:git://github.com/liveSense/org.liveSense.service.xssRemove.git</connection>
-      <developerConnection>scm:git:git://github.com/liveSense/org.liveSense.service.xssRemove.git</developerConnection>
-      <url>https://github.com/liveSense/org.liveSense.service.xssRemove</url>
-  </scm>
+    </parent>
+	<scm>
+		<connection>scm:git:https://github.com/liveSense/org.liveSense.service.xssRemove.git</connection>
+		<developerConnection>scm:git:https://github.com/liveSense/org.liveSense.service.xssRemove.git</developerConnection>
+		<url>https://github.com/liveSense/org.liveSense.service.xssRemove</url>
+	</scm>
 
     <artifactId>org.liveSense.service.xssRemove</artifactId>
     <packaging>bundle</packaging>
     <version>1.0.1-SNAPSHOT</version>
     <name>liveSense :: Service :: XSS Remove</name>
     <description>liveSense XSS Vulnerability Remove service and observer</description>
-
+    
     <build>
         <plugins>
-
-               <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-scr-plugin</artifactId>
-                </plugin>
-
+            
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+            </plugin>
+            
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-
+                        
                         <Export-Package>
                             org.liveSense.service.XSSRemove.*;version=${project.version}
                         </Export-Package>
-
+                        
                         <Embed-Dependency>
                             tagsoup
                         </Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>
-
+            
         </plugins>
-
+        
     </build>
     <dependencies>
         <dependency>
