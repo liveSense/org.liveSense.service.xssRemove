@@ -26,14 +26,19 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Dictionary;
+
 import javax.jcr.Node;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.observation.Event;
 import javax.jcr.observation.ObservationManager;
-import org.apache.sling.commons.osgi.OsgiUtil;
 
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Properties;
+import org.apache.felix.scr.annotations.Property;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.sling.commons.osgi.OsgiUtil;
 import org.apache.sling.jcr.api.SlingRepository;
 import org.ccil.cowan.tagsoup.XMLWriter;
 import org.liveSense.core.Configurator;
@@ -48,91 +53,56 @@ import org.xml.sax.SAXNotSupportedException;
  * Observe the users content for changes, and generate
  * thumbnails when images are added.
  *
- * @scr.component immediate="true" metatype="true"
- *
  */
 
+@Component(metatype=true, immediate=true)
+@Properties(value={
+		@Property(label="%contentPathes.name", description="%contentPathes.description", name=XSSRemoveImpl.PARAM_CONTENT_PATHES ),
+		@Property(label="%supportedMimeTypes.name", description="%supportedMimeTypes.description", name=XSSRemoveImpl.PARAM_SUPPORTED_MIME_TYPES),
+		@Property(label="%elementRemovalList.name", description="%elementRemovalList.description", name=XSSRemoveImpl.PARAM_ELEMENT_REMOVAL_LIST),
+		@Property(label="%attributeNameRemovalList.name", description="%attributeNameRemovalList.description", name=XSSRemoveImpl.PARAM_ATTRIBUTE_NAME_REMOVAL_LIST),
+		@Property(label="%attributeNameStartList.name", description="%attributeNameStartList.description", name=XSSRemoveImpl.PARAM_ATTRIBUTE_NAME_START_LIST),
+		@Property(label="%attributeTypeValueStartList.name", description="%attributeNameStartList.description", name=XSSRemoveImpl.PARAM_ATTRIBUTE_TYPE_VALUE_START_LIST),
+		@Property(label="%attributeSrcHrefList.name", description="%attributeSrcHrefList.description", name=XSSRemoveImpl.PARAM_ATTRIBUTE_SRC_HREF_LIST),
+		@Property(label="%elementReplacementList.name", description="%elementReplacementList.description", name=XSSRemoveImpl.PARAM_ELEMENT_REPLACEMENT_LIST),
+		@Property(label="%styleContentList.name", description="%styleContentList.description", name=XSSRemoveImpl.PARAM_STYLE_CONTENT_LIST)
+})
 public class XSSRemoveImpl implements XSSRemove {
 
     private static final Logger log = LoggerFactory.getLogger(XSSRemoveImpl.class);
 
     private ObservationManager observationManager;
-    /**
-     * @scr.reference
-     */
+
+    @Reference
     private SlingRepository repository;
 
-    /**
-     * @scr.reference
-     */
+    @Reference
     private Configurator configurator;
 
-    /**
-     * @scr.property    label="%contentPathes.name"
-     *                  description="%contentPathes.description"
-     *                  valueRef="DEFAULT_CONTENT_PATHES"
-     */
     public static final String PARAM_CONTENT_PATHES = "contentPathes";
     public static final String[] DEFAULT_CONTENT_PATHES = {"/sites", "/users"};
     private String[] contentPathes = DEFAULT_CONTENT_PATHES;
 
-    /**
-     * @scr.property    label="%supportedMimeTypes.name"
-     *                  description="%supportedMimeTypes.description"
-     *                  valueRef="DEFAULT_SUPPORTED_MIME_TYPES"
-     */
     public static final String PARAM_SUPPORTED_MIME_TYPES = "supportedMimeTypes";
     public static final String[] DEFAULT_SUPPORTED_MIME_TYPES = {"text/html"};
     private String[] supportedMimeTypes = DEFAULT_SUPPORTED_MIME_TYPES;
 
-
-
-    /**
-     * @scr.property    label="%elementRemovalList.name"
-     *                  description="%elementRemovalList.description"
-     *                  valueRef="DEFAULT_ELEMENT_REMOVAL_LIST"
-     */
     public static final String PARAM_ELEMENT_REMOVAL_LIST = "elementRemovalList";
     public static final String[] DEFAULT_ELEMENT_REMOVAL_LIST = {"script", "applet", "embed", "xml", "bgsound", "meta", "link", "style", "base"};
     private String[] elementRemovalList = DEFAULT_ELEMENT_REMOVAL_LIST;
 
-
-    /**
-     * @scr.property    label="%attributeNameRemovalList.name"
-     *                  description="%attributeNameRemovalList.description"
-     *                  valueRef="DEFAULT_ATTRIBUTE_NAME_REMOVAL_LIST"
-     */
     public static final String PARAM_ATTRIBUTE_NAME_REMOVAL_LIST = "attributeNameRemovalList";
     public static final String[] DEFAULT_ATTRIBUTE_NAME_REMOVAL_LIST = {"onload", "onclick", "onchange", "onsubmit", "onmouseover", "onerror", "dynsrc", "datasrc", "datafld", "dataformatas"};
     private String[] attributeNameRemovalList = DEFAULT_ATTRIBUTE_NAME_REMOVAL_LIST;
 
-
-    /**
-     * @scr.property    label="%attributeNameStartList.name"
-     *                  description="%attributeNameStartList.description"
-     *                  valueRef="DEFAULT_ATTRIBUTE_NAME_START_LIST"
-     */
     public static final String PARAM_ATTRIBUTE_NAME_START_LIST = "attributeNameStartList";
     public static final String[] DEFAULT_ATTRIBUTE_NAME_START_LIST = {"on"};
     private String[] attributeNameStartList = DEFAULT_ATTRIBUTE_NAME_START_LIST;
 
-
-
-    /**
-     * @scr.property    label="%attributeTypeValueStartList.name"
-     *                  description="%attributeTypeValueStartList.description"
-     *                  valueRef="DEFAULT_ATTRIBUTE_TYPE_VALUE_START_LIST"
-     */
     public static final String PARAM_ATTRIBUTE_TYPE_VALUE_START_LIST = "attributeTypeValueStartList";
     public static final String[] DEFAULT_ATTRIBUTE_TYPE_VALUE_START_LIST =  {"text/javascript"};
     private String[] attributeTypeValueStartList = DEFAULT_ATTRIBUTE_TYPE_VALUE_START_LIST;
 
-
-    /**
-     * @scr.property    label="%attributeSrcHrefList.name"
-     *                  description="%attributeSrcHrefList.description"
-     *                  valueRef="DEFAULT_ATTRIBUTE_SRC_HREF_LIST"
-     */
     public static final String PARAM_ATTRIBUTE_SRC_HREF_LIST = "attributeSrcHrefList";
     public static final String[] DEFAULT_ATTRIBUTE_SRC_HREF_LIST = {"javascript:", // javascript
             "^\\s*j\\s*a\\s*v\\s*a\\s*s\\s*c\\s*r\\s*i\\s*p\\s*t\\s*:", // javascript
@@ -144,22 +114,10 @@ public class XSSRemoveImpl implements XSSRemove {
     };
     private String[] attributeSrcHrefList = DEFAULT_ATTRIBUTE_SRC_HREF_LIST;
 
-
-    /**
-     * @scr.property    label="%elementReplacementList.name"
-     *                  description="%elementReplacementList.description"
-     *                  valueRef="DEFAULT_ELEMENT_REPLACEMENT_LIST"
-     */
     public static final String PARAM_ELEMENT_REPLACEMENT_LIST = "elementReplacementList";
     public static final String[] DEFAULT_ELEMENT_REPLACEMENT_LIST = {"html/div", "head/div", "body/div", "iframe/div", "frame/div", "frameset/div", "layer/div", "ilayer/div", "blink/span", "object/div"};
     private String[] elementReplacementList = DEFAULT_ELEMENT_REPLACEMENT_LIST;
 
-
-    /**
-     * @scr.property    label="%styleContentList.name"
-     *                  description="%styleContentList.description"
-     *                  valueRef="DEFAULT_STYLE_CONTENT_LIST"
-     */
     public static final String PARAM_STYLE_CONTENT_LIST = "styleContentList";
     public static final String[] DEFAULT_STYLE_CONTENT_LIST = {"javascript", "expression"};
     private String[] styleContentList = DEFAULT_STYLE_CONTENT_LIST;
